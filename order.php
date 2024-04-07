@@ -11,6 +11,26 @@
 	 		  - Return the order info
 	 */
 
+
+	 function get_order_info(PDO $pdo, string $orderNum, string $userEmail) {
+
+		// SQL query to retrieve toy information based on the ordernum and user email
+		$sql = "SELECT * 
+			FROM orders as o
+			join customer as c
+			on o.custnum = c.custnum
+			WHERE ordernum= :id
+			AND email = :userEmail;";	// :id is a placeholder for value provided later 
+		                               // It's a parameterized query that helps prevent SQL injection attacks and ensures safer interaction with the database.
+
+
+		// Execute the SQL query using the pdo function and fetch the result
+		$orderInfo = pdo($pdo, $sql, ['id' => $orderNum, 'userEmail' => $userEmail])->fetch();		// Associative array where 'id' is the key and $id is the value. Used to bind the value of $id to the placeholder :id in  SQL query.
+		
+		// Return the order information (associative array)
+		return $orderInfo;
+	}
+
 	
 	// Check if the request method is POST (i.e, form submitted)
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -25,6 +45,7 @@
 		/*
 		 * TO-DO: Retrieve info about order from the db using provided PDO connection
 		 */
+		$orderInfo = get_order_info($pdo, $orderNum, $email);
 		
 	}
 // Closing PHP tag  ?> 
@@ -89,19 +110,19 @@
 				  -- TO-DO: Check if variable holding order is not empty. Make sure to replace null with your variable!
 				  -->
 				
-				<?php if (!empty(null)): ?>
+				<?php if (!empty($orderInfo)): ?>
 					<div class="order-details">
 
 						<!-- 
 				  		  -- TO DO: Fill in ALL the placeholders for this order from the db
   						  -->
 						<h1>Order Details</h1>
-						<p><strong>Name: </strong> <?= '' ?></p>
-				        	<p><strong>Username: </strong> <?= '' ?></p>
-				        	<p><strong>Order Number: </strong> <?= '' ?></p>
-				        	<p><strong>Quantity: </strong> <?= '' ?></p>
-				        	<p><strong>Date Ordered: </strong> <?= '' ?></p>
-				        	<p><strong>Delivery Date: </strong> <?= '' ?></p>
+						<p><strong>Name: </strong> <?= $orderInfo['cname'] ?></p>
+				        	<p><strong>Username: </strong> <?= $orderInfo['username'] ?></p>
+				        	<p><strong>Order Number: </strong> <?= $orderInfo['ordernum'] ?></p>
+				        	<p><strong>Quantity: </strong> <?= $orderInfo['quantity'] ?></p>
+				        	<p><strong>Date Ordered: </strong> <?= $orderInfo['date_ordered'] ?></p>
+				        	<p><strong>Delivery Date: </strong> <?= $orderInfo['date_deliv'] ?></p>
 				      
 					</div>
 				<?php endif; ?>
